@@ -70,9 +70,10 @@ export class HomePage {
         }else{
           this.apiService.getNews(this.tempWords).subscribe((data)=>{
             this.todos = data['title'];
+            this.text=this.tempWords;
             this.tempWords = '';
-            setTimeout(()=>{
-              this.texttospeechService.speak(this.todos);
+            this.texttospeechService.speak(this.todos);
+            setTimeout(()=>{              
               this.recognition.start();
             },5000);            
           },(error) => {
