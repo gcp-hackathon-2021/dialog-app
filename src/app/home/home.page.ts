@@ -32,25 +32,22 @@ export class HomePage {
   init() {
     this.recognition.interimResults = true;
     this.recognition.lang = 'en-IN';
-    this.recognition.onresult = function(event) {
-      const transcript = Array.from(event.results)
-           .map((result) => result[0])
-           .map((result) => result.transcript)
-           .join('');
-         this.tempWords = transcript;
-         console.log(transcript);
-    }
-    this.recognition.onaudiostart = function() {
-      console.log('Audio capturing started');
-    }
-    // this.recognition.addEventListener('result', (e) => {
-    //   const transcript = Array.from(e.results)
-    //     .map((result) => result[0])
-    //     .map((result) => result.transcript)
-    //     .join('');
-    //   this.tempWords = transcript;
-    //   console.log(transcript);
-    // });
+    // this.recognition.onresult = function(event) {
+    //   const transcript = Array.from(event.results)
+    //        .map((result) => result[0])
+    //        .map((result) => result.transcript)
+    //        .join('');
+    //      this.tempWords = transcript;
+    //      console.log(transcript);
+    // }
+    this.recognition.addEventListener('result', (e) => {
+       const transcript = Array.from(e.results)
+         .map((result) => result[0])
+         .map((result) => result.transcript)
+         .join('');
+       this.tempWords = transcript;
+       console.log(transcript);
+    });
   }
 
   startListening(){
@@ -69,16 +66,19 @@ export class HomePage {
         console.log(this.tempWords);
         if(!this.tempWords || ""===this.tempWords || undefined===this.tempWords){
           this.tempWords = '';     
-          setTimeout(()=>{this.stopListening();},100);
+          setTimeout(()=>{this.recognition.start();},100);
         }else{
           this.apiService.getNews(this.tempWords).subscribe((data)=>{
             this.todos = data['title'];
             this.tempWords = '';
-            this.texttospeechService.speak(this.todos);
+            setTimeout(()=>{
+              this.texttospeechService.speak(this.todos);
+              this.recognition.start();
+            },5000);            
           },(error) => {
             console.error('error caught in component');
             this.tempWords = '';     
-            setTimeout(()=>{this.recognition.start();},100);
+            setTimeout(()=>{this.recognition.start();},1000);
           });
         }
       }
