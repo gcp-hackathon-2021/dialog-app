@@ -11,11 +11,13 @@ var SpeechRecognition: any = SpeechRecognition || webkitSpeechRecognition;
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
+
 export class HomePage {
   todos: string
   micon = false;
   micoff= true;
-  recognition =  new SpeechRecognition();
+  recognition:SpeechRecognition;
+  conversationHistory:Conversation[]=new Array();
   isStoppedSpeechRecog = false;
   text: string;
   tempWords: string;
@@ -30,6 +32,7 @@ export class HomePage {
   }
 
   init() {
+    this.recognition =  new SpeechRecognition();
     this.recognition.interimResults = true;
     this.recognition.lang = 'en-IN';
     // this.recognition.onresult = function(event) {
@@ -51,7 +54,9 @@ export class HomePage {
   }
 
   startListening(){
-    this.init();
+    if(!this.recognition || this.recognition===null ){
+      this.init();
+    }    
     this.micon=true;
     this.micoff=false;
     this.isStoppedSpeechRecog = false;
@@ -70,16 +75,27 @@ export class HomePage {
         }else{
           this.apiService.getNews(this.tempWords).subscribe((data)=>{
             this.todos = data['title'];
-            this.text=this.tempWords;
+            var conversation = new Conversation(this.text, this.todos);
+            this.conversationHistory.push(conversation);
             this.tempWords = '';
             this.texttospeechService.speak(this.todos);
-            setTimeout(()=>{              
-              this.recognition.start();
-            },5000);            
+            setTimeout(()=>{ 
+              if(this.recognition && this.recognition!==null ){             
+                this.recognition.start();
+              }
+            },6000);
           },(error) => {
             console.error('error caught in component');
-            this.tempWords = '';     
-            setTimeout(()=>{this.recognition.start();},1000);
+            this.tempWords = '';
+            var errormsg = "I can't understant";
+            var conversation = new Conversation(this.text, errormsg);
+            this.conversationHistory.push(conversation);
+            this.texttospeechService.speak(errormsg);
+            setTimeout(()=>{
+              if(this.recognition && this.recognition!==null ){             
+                this.recognition.start();
+              }
+            },1000);
           });
         }
       }
@@ -92,6 +108,26 @@ export class HomePage {
     this.micoff=true;
     this.isStoppedSpeechRecog = true;
     this.recognition.stop();
+    setTimeout(()=>{this.recognition=null;},1000);
+    
     console.log("End speech recognition");
   }
 }
+
+
+
+class Conversation { 
+  //field 
+  question:string; 
+  answer:string; 
+  //constructor 
+  constructor(question:string, answer:string) { 
+    this.question = question;
+    this.answer = answer;
+  }  
+  
+  //function 
+  disp():void { 
+     console.log(this.question+":"+this.answer);
+  } 
+} 

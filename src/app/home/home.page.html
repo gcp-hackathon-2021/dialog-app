@@ -18,35 +18,14 @@
       <ion-icon name="mic" (click)="stopListening()"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-subtitle>Card Subtitle</ion-card-subtitle>
-      <ion-card-title>Card Title</ion-card-title>
-    </ion-card-header>
   
-    <ion-card-content>
-      Keep close to Nature's heart... and break clear away, once in awhile,
-      and climb a mountain or spend a week in the woods. Wash your spirit clean.
-    </ion-card-content>
-  </ion-card>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-subtitle>Conversation Point</ion-card-subtitle>
-      <ion-card-title>history of conversation</ion-card-title>
-    </ion-card-header>
-  
-    <!-- <ion-card-content *ngFor="let line of text">
-      {{line}}
-    </ion-card-content> -->
-  </ion-card>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-subtitle>Conversation Point</ion-card-subtitle>
-      <ion-card-title>history of conversation</ion-card-title>
-    </ion-card-header>
-  
-    <ion-card-content>
-      {{todos}}
-    </ion-card-content>
-  </ion-card>
+  <ion-list no-lines class="msgbubble" *ngFor="let conversation of conversationHistory">
+    
+    <div class="innermsg right" >
+      {{conversation.question}}
+    </div>
+    <div class="innermsg left" >
+      {{conversation.answer}}
+    </div>
+  </ion-list>
 </ion-content>
