@@ -5,8 +5,8 @@ import { ApiService } from '../api.service';
 import { DialogflowApiService } from '../dialogflow-api.service';
 //import { SpeechtotextService } from '../speechtotext.service';
 import { TexttospeechService } from '../texttospeech.service';
-declare var webkitSpeechRecognition: any;
-var SpeechRecognition: any = SpeechRecognition || webkitSpeechRecognition;
+//declare var webkitSpeechRecognition: any;
+var SpeechRecognition: any = SpeechRecognition || window["webkitSpeechRecognition"];
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -99,30 +99,6 @@ export class HomePage {
               }
             },1000);
           });
-          /*this.apiService.getNews(this.tempWords).subscribe((data)=>{
-            this.todos = data['title'];
-            var conversation = new Conversation(this.text, this.todos);
-            this.conversationHistory.push(conversation);
-            this.tempWords = '';
-            this.texttospeechService.speak(this.todos);
-            setTimeout(()=>{ 
-              if(this.recognition && this.recognition!==null ){             
-                this.recognition.start();
-              }
-            },6000);
-          },(error) => {
-            console.error('error caught in component');
-            this.tempWords = '';
-            var errormsg = "I can't understant";
-            var conversation = new Conversation(this.text, errormsg);
-            this.conversationHistory.push(conversation);
-            this.texttospeechService.speak(errormsg);
-            setTimeout(()=>{
-              if(this.recognition && this.recognition!==null ){             
-                this.recognition.start();
-              }
-            },1000);
-          });*/
         }
       }
     });    
@@ -134,8 +110,7 @@ export class HomePage {
     this.micoff=true;
     this.isStoppedSpeechRecog = true;
     this.recognition.stop();
-    setTimeout(()=>{this.recognition=null;},1000);
-    
+    setTimeout(()=>{this.recognition=null;},1000);    
     console.log("End speech recognition");
   }
 }
