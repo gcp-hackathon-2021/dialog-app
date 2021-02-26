@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {Platform} from '@ionic/angular';
 
 import { ApiService } from '../api.service';
+import { DialogflowApiService } from '../dialogflow-api.service';
 //import { SpeechtotextService } from '../speechtotext.service';
 import { TexttospeechService } from '../texttospeech.service';
 declare var webkitSpeechRecognition: any;
@@ -21,7 +22,8 @@ export class HomePage {
   isStoppedSpeechRecog = false;
   text: string;
   tempWords: string;
-  constructor(private plt: Platform, private apiService: ApiService, private texttospeechService: TexttospeechService){}//, private speechRecognition : SpeechRecognition) {}
+  constructor(private plt: Platform, private apiService: ApiService, 
+    private texttospeechService: TexttospeechService, private dialogflowApiService: DialogflowApiService){}
 
   isAndroid(){
     return !this.plt.is('ios');
@@ -73,7 +75,31 @@ export class HomePage {
           this.tempWords = '';     
           setTimeout(()=>{this.recognition.start();},100);
         }else{
-          this.apiService.getNews(this.tempWords).subscribe((data)=>{
+          this.dialogflowApiService.getDialogResponse(this.tempWords).subscribe((data:any)=>{
+            this.todos = data.fulfillmentText;
+            var conversation = new Conversation(this.text, this.todos);
+            this.conversationHistory.push(conversation);
+            this.tempWords = '';
+            this.texttospeechService.speak(this.todos);
+            setTimeout(()=>{ 
+              if(this.recognition && this.recognition!==null ){             
+                this.recognition.start();
+              }
+            },5000);
+          }, error =>{
+            console.error('error caught in component');
+            this.tempWords = '';
+            var errormsg = "I can't understant";
+            var conversation = new Conversation(this.text, errormsg);
+            this.conversationHistory.push(conversation);
+            this.texttospeechService.speak(errormsg);
+            setTimeout(()=>{
+              if(this.recognition && this.recognition!==null ){             
+                this.recognition.start();
+              }
+            },1000);
+          });
+          /*this.apiService.getNews(this.tempWords).subscribe((data)=>{
             this.todos = data['title'];
             var conversation = new Conversation(this.text, this.todos);
             this.conversationHistory.push(conversation);
@@ -96,7 +122,7 @@ export class HomePage {
                 this.recognition.start();
               }
             },1000);
-          });
+          });*/
         }
       }
     });    
