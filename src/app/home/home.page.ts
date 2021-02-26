@@ -18,6 +18,7 @@ export class HomePage {
   micon = false;
   micoff= true;
   recognition:SpeechRecognition;
+  conversation:Conversation;
   conversationHistory:Conversation[]=new Array();
   isStoppedSpeechRecog = false;
   text: string;
@@ -37,14 +38,6 @@ export class HomePage {
     this.recognition =  new SpeechRecognition();
     this.recognition.interimResults = true;
     this.recognition.lang = 'en-IN';
-    // this.recognition.onresult = function(event) {
-    //   const transcript = Array.from(event.results)
-    //        .map((result) => result[0])
-    //        .map((result) => result.transcript)
-    //        .join('');
-    //      this.tempWords = transcript;
-    //      console.log(transcript);
-    // }
     this.recognition.addEventListener('result', (e) => {
        const transcript = Array.from(e.results)
          .map((result) => result[0])
@@ -58,6 +51,7 @@ export class HomePage {
   startListening(){
     if(!this.recognition || this.recognition===null ){
       this.init();
+      this.texttospeechService.initSpeach();
     }    
     this.micon=true;
     this.micoff=false;
@@ -75,10 +69,11 @@ export class HomePage {
           this.tempWords = '';     
           setTimeout(()=>{this.recognition.start();},100);
         }else{
+          this.conversation = new Conversation(this.tempWords, "wait for the response...");
+          this.conversationHistory.push(this.conversation);
           this.dialogflowApiService.getDialogResponse(this.tempWords).subscribe((data:any)=>{
-            this.todos = data.fulfillmentText;
-            var conversation = new Conversation(this.text, this.todos);
-            this.conversationHistory.push(conversation);
+            this.todos = data.fulfillmentText;  
+            this.conversation.answer=  this.todos;
             this.tempWords = '';
             this.texttospeechService.speak(this.todos);
             setTimeout(()=>{ 
@@ -122,6 +117,7 @@ class Conversation {
   question:string; 
   answer:string; 
   //constructor 
+  
   constructor(question:string, answer:string) { 
     this.question = question;
     this.answer = answer;

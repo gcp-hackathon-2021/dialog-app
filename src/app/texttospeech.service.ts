@@ -4,23 +4,23 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class TexttospeechService {
-
+  msg;
   constructor() { }
-  speak(resultText: string){
-    var msg = new SpeechSynthesisUtterance();
+  initSpeach(){
+    this.msg = new SpeechSynthesisUtterance();
     var voices = window.speechSynthesis.getVoices();
-    msg.voice = voices[1]; // Note: some voices don't support altering params
+    this.msg.voice = voices[1]; // Note: some voices don't support altering params
     //msg.voiceURI = 'native';
-    msg.volume = 1; // 0 to 1
-    msg.rate = 1; // 0.1 to 10
-    msg.pitch = 1; //0 to 2
-    msg.text = resultText;
-    msg.lang = 'en-IN';
-    console.debug;
-    msg.onend = function(e) {
+    this.msg.volume = 1; // 0 to 1
+    this.msg.rate = 1; // 0.1 to 10
+    this.msg.pitch = 1; //0 to 2
+    this.msg.lang = 'en-IN';
+    this.msg.onend = function(e) {
       console.log('Finished in ' + e.elapsedTime + ' seconds.');
     };
-
-    speechSynthesis.speak(msg);
+  }
+  speak(resultText: string){
+    this.msg.text = resultText;
+    speechSynthesis.speak(this.msg);
   }
 }
