@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {Platform} from '@ionic/angular';
 
 import { ApiService } from '../api.service';
@@ -13,7 +13,7 @@ var SpeechRecognition: any = SpeechRecognition || window["webkitSpeechRecognitio
   styleUrls: ['home.page.scss'],
 })
 
-export class HomePage {
+export class HomePage implements OnInit{
   todos: string
   micon = false;
   micoff= true;
@@ -25,7 +25,7 @@ export class HomePage {
   tempWords: string;
   constructor(private plt: Platform, private apiService: ApiService, 
     private texttospeechService: TexttospeechService, private dialogflowApiService: DialogflowApiService){}
-
+  
   isAndroid(){
     return !this.plt.is('ios');
   }
@@ -107,6 +107,14 @@ export class HomePage {
     this.recognition.stop();
     setTimeout(()=>{this.recognition=null;},1000);    
     console.log("End speech recognition");
+  }
+
+  ngOnInit() {
+    this.init();
+    this.texttospeechService.initSpeach();
+    this.conversation = new Conversation("", "Hi, Welcome, You can enable the microphone");
+    this.texttospeechService.speak(this.conversation.answer);
+    this.conversationHistory.push(this.conversation);
   }
 }
 
